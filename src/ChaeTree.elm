@@ -31,7 +31,7 @@ Beside this every `Node` has its `id` which makes some useful manipulations easi
 @docs push, fromList, subTreeFor
 
 # Examples
-Please see [example](https://github.com/turbomack/chaetree/examples) implementations to learn more.
+Please see [example](https://github.com/turboMaCk/ChaeTree/tree/master/examples) implementations to learn more.
 
 -}
 

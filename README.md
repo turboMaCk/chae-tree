@@ -14,5 +14,5 @@ Beside this every `Node` has its `id` which makes some useful manipulations easi
 elm-package install turbomack/chaetree
 ```
 
-For more informations please follow [documentation](http://package.elm-lang.org/turbomack/chaetree)
-or see [examples](https://github.com/turboMaCk/ChaeTree/examples) of usage.
+For more informations please follow [documentation](http://package.elm-lang.org/packages/turbomack/chaetree/latest)
+or see [examples](https://github.com/turboMaCk/ChaeTree/tree/master/examples) of usage.
