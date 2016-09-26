@@ -177,11 +177,19 @@ subTreeFor' id ( tree, accestors ) =
             List.filter (\n -> Node.id n == id) tree
 
         subMatches node =
-            subTreeFor' id ( Node.children node, (Node.root node) :: accestors )
+            let
+                ( _, item, children ) =
+                    Node.toTuple node
+            in
+                subTreeFor' id ( children, item :: accestors )
     in
         case (List.head matches) of
             Just node ->
-                ( (Node.children node), (Node.root node) :: accestors )
+                let
+                    ( _, item, children ) =
+                        Node.toTuple node
+                in
+                    ( children, item :: accestors )
 
             Nothing ->
                 List.foldr

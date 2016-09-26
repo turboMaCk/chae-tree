@@ -9,6 +9,7 @@ module ChaeTree.Node
         , addChild
         , children
         , hasChildren
+        , toTuple
         , map
         , map2
         , foldr
@@ -19,7 +20,7 @@ module ChaeTree.Node
 
 {-| Manipulationg with `None` based data structure
 
-@docs Node, singleton, simple, node, id, root, addChild, children, hasChildren, map, map2, foldr, sum, product, pushDeep
+@docs Node, singleton, simple, node, id, root, addChild, children, hasChildren, toTuple, map, map2, foldr, sum, product, pushDeep
 
 -}
 
@@ -122,6 +123,16 @@ hasChildren : Node a -> Bool
 hasChildren tree =
     children tree |> List.isEmpty |> not
 
+
+{-| Transform node to tupple of
+
+- id (`String`) - Id of node
+- item inside node
+- Children (`List (Node a)`) - child nodes
+-}
+toTuple : Node a -> (Id, a, List (Node a))
+toTuple (Node id a c) =
+  (id, a, c)
 
 
 -- Common operations
