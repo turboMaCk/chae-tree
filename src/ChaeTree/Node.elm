@@ -12,6 +12,8 @@ module ChaeTree.Node
         , toTuple
         , map
         , map2
+        , flatten
+        , flatMap
         , foldr
         , sum
         , product
@@ -20,7 +22,7 @@ module ChaeTree.Node
 
 {-| Manipulationg with `None` based data structure
 
-@docs Node, singleton, simple, node, id, root, addChild, children, hasChildren, toTuple, map, map2, foldr, sum, product, pushDeep
+@docs Node, singleton, simple, node, id, root, addChild, children, hasChildren, toTuple, map, map2, flatten, flatMap, foldr, sum, product, pushDeep
 
 -}
 
@@ -54,17 +56,20 @@ singleton : (a -> Id) -> a -> Node a
 singleton getId item =
     Node (getId item) item []
 
+
 {-| Create node manualy
 -}
 node : a -> b -> List (Node b) -> Node b
 node id a c =
-  Node (toId id) a c
+    Node (toId id) a c
+
 
 {-| Simple node creation
 -}
 simple : a -> List (Node a) -> Node a
 simple a =
-  node a a
+    node a a
+
 
 {-| Get id of given `Node`.
 
@@ -130,9 +135,10 @@ hasChildren tree =
 - item inside node
 - Children (`List (Node a)`) - child nodes
 -}
-toTuple : Node a -> (Id, a, List (Node a))
+toTuple : Node a -> ( Id, a, List (Node a) )
 toTuple (Node id a c) =
-  (id, a, c)
+    ( id, a, c )
+
 
 
 -- Common operations
@@ -161,6 +167,24 @@ map2 getId fc (Node _ a ca) (Node _ b cb) =
 zip : (a -> b -> Id) -> Node a -> Node b -> Node ( a, b )
 zip getId =
     map2 getId (,)
+
+
+{-|
+-}
+flatten : (Id -> Id -> Id) -> Node (Node a) -> Node a
+flatten getId (Node id1 (Node id2 a c) cs) =
+    Node (getId id1 id2) a (c ++ List.map (flatten getId) cs)
+
+
+{-|
+    tree = simple 1 [ simple 2 [], simple 3 [ simple 4 []]]
+
+    flatMap toId (\a -> simple (a * 2) []) tree == Node "2" 2 ([Node "4" 4 [],Node "6" 6 ([Node "8" 8 []])])
+    flatMap toId (\a -> simple (a *2) [n (a * 3) []]) tree == Node "2" 2 ([Node "3" 3 [],Node "4" 4 ([Node "6" 6 []]),Node "6" 6 ([Node "9" 9 [],Node "8" 8 ([Node "12" 12 []])])])
+-}
+flatMap : (a -> Id) -> (a -> Node b) -> Node a -> Node b
+flatMap getId fc =
+    map getId fc >> (flatten (\aid _ -> aid))
 
 
 {-|
