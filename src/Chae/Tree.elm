@@ -1,12 +1,11 @@
-module ChaeTree.Tree
+module Chae.Tree
     exposing
         ( Tree
         , map
         , map2
         , zip
-        , foldr
-        , sum
-        , product
+        , reduce
+        , filter
         , push
         , fromList
         , subTreeFor
@@ -14,13 +13,26 @@ module ChaeTree.Tree
 
 {-| Tree
 
-@docs Tree @map2, zip, foldr, sum, product, push, fromList, subTreeFor
+# Definition
+@docs Tree
+
+# Constructors
+@docs nil, fromList
+
+# Query a Tree
+@docs subTreeFor
+
+# Common Operations
+@docs push
+
+# Map - Reduce
+@docs map, map2, zip, reduce, filter
 
 -}
 
 import List
-import ChaeTree.Id exposing (..)
-import ChaeTree.Node as Node
+import Chae.Id exposing (..)
+import Chae.Node as Node
 import Maybe exposing (Maybe(..))
 
 
@@ -31,6 +43,12 @@ import Maybe exposing (Maybe(..))
 -}
 type alias Tree a =
     List (Node.Node a)
+
+
+{-|
+-}
+nil =
+    []
 
 
 {-|
@@ -56,23 +74,23 @@ zip getId =
 
 {-|
 -}
-foldr : (a -> b -> b) -> b -> Tree a -> b
-foldr reducer b tree =
-    List.foldr (flip (Node.foldr reducer)) b tree
+reduce : (a -> b -> b) -> b -> Tree a -> b
+reduce reducer b =
+    List.foldl (flip (Node.reduce reducer)) b
 
 
-{-|
+{-| Filter
 -}
-sum : Tree number -> number
-sum =
-    foldr (+) 0
-
-
-{-|
--}
-product : Tree number -> number
-product =
-    foldr (*) 1
+filter : (a -> Bool) -> Tree a -> Tree a
+filter fc =
+    List.foldl
+        (\(Node.Node id a c) acc ->
+            if fc a then
+                (Node.Node id a (filter fc c)) :: acc
+            else
+                acc
+        )
+        []
 
 
 {-| Produce new tree with given item pushed under its parent.

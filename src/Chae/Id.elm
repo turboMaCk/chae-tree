@@ -1,4 +1,4 @@
-module ChaeTree.Id exposing (Id, toId)
+module Chae.Id exposing (Id, toId)
 
 {-| This module implements basic `Id` type manipulations
 that are used across other data types.

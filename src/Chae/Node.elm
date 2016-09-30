@@ -1,9 +1,8 @@
-module ChaeTree.Node
+module Chae.Node
     exposing
-        ( Node
+        ( Node(..)
         , singleton
         , node
-        , simple
         , id
         , root
         , addChild
@@ -14,21 +13,32 @@ module ChaeTree.Node
         , map2
         , flatten
         , flatMap
-        , foldr
-        , sum
-        , product
+        , reduce
         , pushDeep
         )
 
 {-| Manipulationg with `None` based data structure
 
-@docs Node, singleton, simple, node, id, root, addChild, children, hasChildren, toTuple, map, map2, flatten, flatMap, foldr, sum, product, pushDeep
+# Definition
+@docs Node
+
+# Constructors
+@docs singleton, node
+
+# Query a Node
+@docs id, root, children, hasChildren, toTuple
+
+# Common operations
+@docs addChild, pushDeep
+
+# Map - Reduce
+@docs map, map2, flatten, flatMap, reduce
 
 -}
 
 import List
 import Maybe exposing (Maybe(..))
-import ChaeTree.Id exposing (..)
+import Chae.Id exposing (..)
 
 
 -- Types
@@ -62,13 +72,6 @@ singleton getId item =
 node : a -> b -> List (Node b) -> Node b
 node id a c =
     Node (toId id) a c
-
-
-{-| Simple node creation
--}
-simple : a -> List (Node a) -> Node a
-simple a =
-    node a a
 
 
 {-| Get id of given `Node`.
@@ -177,10 +180,10 @@ flatten getId (Node id1 (Node id2 a c) cs) =
 
 
 {-|
-    tree = simple 1 [ simple 2 [], simple 3 [ simple 4 []]]
+    tree = node toId 1 [ node toId 2 [], node toId 3 [ node toId 4 []]]
 
-    flatMap toId (\a -> simple (a * 2) []) tree == Node "2" 2 ([Node "4" 4 [],Node "6" 6 ([Node "8" 8 []])])
-    flatMap toId (\a -> simple (a *2) [n (a * 3) []]) tree == Node "2" 2 ([Node "3" 3 [],Node "4" 4 ([Node "6" 6 []]),Node "6" 6 ([Node "9" 9 [],Node "8" 8 ([Node "12" 12 []])])])
+    flatMap toId (\a -> node toId (a * 2) []) tree == Node "2" 2 ([Node "4" 4 [],Node "6" 6 ([Node "8" 8 []])])
+    flatMap toId (\a -> node toId (a *2) [n (a * 3) []]) tree == Node "2" 2 ([Node "3" 3 [],Node "4" 4 ([Node "6" 6 []]),Node "6" 6 ([Node "9" 9 [],Node "8" 8 ([Node "12" 12 []])])])
 -}
 flatMap : (a -> Id) -> (a -> Node b) -> Node a -> Node b
 flatMap getId fc =
@@ -188,29 +191,12 @@ flatMap getId fc =
 
 
 {-|
-    foldr (+) 0 (addChild toId 20 (singleton toId 1)) == 21
-    folr (*) 1 (addChild toId 3 (singleton toId 4)) == 12
+    reduce (+) 0 (addChild toId 20 (singleton toId 1)) == 21
+    reduce (*) 1 (addChild toId 3 (singleton toId 4)) == 12
 -}
-foldr : (a -> b -> b) -> b -> Node a -> b
-foldr reducer b (Node _ a c) =
-    List.foldr (flip (foldr reducer)) (reducer a b) c
-
-
-{-|
-    sum (addChild toId 20 (singleton toId 1)) == 21
--}
-sum : Node number -> number
-sum =
-    foldr (+) 0
-
-
-{-|
-    product (addChild toId 3 (singleton toId 4)) == 12
--}
-product : Node number -> number
-product =
-    foldr (*) 1
-
+reduce : (a -> b -> b) -> b -> Node a -> b
+reduce reducer b (Node _ a c) =
+    List.foldl (flip (reduce reducer)) (reducer a b) c
 
 {-| push deep
 -}
