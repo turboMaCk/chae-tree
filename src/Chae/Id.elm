@@ -1,7 +1,6 @@
 module Chae.Id exposing (Id, toId)
 
-{-| This module implements basic `Id` type manipulations
-that are used across other data types.
+{-| This module contains `Id` type implementation.
 
 # Definition
 @docs Id
@@ -12,8 +11,7 @@ that are used across other data types.
 -}
 
 
-{-| `Id` is just alias for `String` type
--}
+{-| -}
 type alias Id =
     String
 
@@ -23,7 +21,7 @@ This is just alias for `toString` function.
 
     toId "str" = "str"
     toId 1 = "1"
-    toId = "{ a = \"a\" }"
+    toId { a = "a" } = "{ a = \"a\" }"
 -}
 toId : a -> Id
 toId =

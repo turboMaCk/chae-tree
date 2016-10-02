@@ -38,16 +38,16 @@ categories : List Category
 categories =
     [ { id = 1, name = "first", parentId = Nothing }
     , { id = 2, name = "child", parentId = Just 1 }
-    , { id = 3, name = "dep categories", parentId = Just 2 }
+    , { id = 3, name = "deep child", parentId = Just 2 }
     ]
 
 
 questions : List Question
 questions =
-    [ { id = 1, name = "root q", categoryIds = [] }
-    , { id = 2, name = "in cat", categoryIds = [ 1 ] }
-    , { id = 3, name = "almost last", categoryIds = [ 2 ] }
-    , { id = 4, name = "last", categoryIds = [ 2, 3 ] }
+    [ { id = 1, name = "root item", categoryIds = [] }
+    , { id = 2, name = "item with parent", categoryIds = [ 1 ] }
+    , { id = 3, name = "deeper nested item", categoryIds = [ 2 ] }
+    , { id = 4, name = "item with two parents", categoryIds = [ 2, 3 ] }
     ]
 
 
@@ -65,7 +65,7 @@ getParentIds : Either Category Question -> List Id
 getParentIds thing =
     case thing of
         Left category ->
-            case category.parentId  of
+            case category.parentId of
                 Just id ->
                     [ Id.toId id ]
 
@@ -129,12 +129,12 @@ itemView : Node (Either Category Question) -> Html Msg
 itemView node =
     case Node.root node of
         Right question ->
-            li [] [ text (">> " ++ (.name question)) ]
+            li [] [ text ("item: " ++ (.name question)) ]
 
         Left category ->
             li []
                 [ a [ Events.onClick (Open (Just (Node.id node))) ]
-                    [ text (.name category ++ " >") ]
+                    [ text ("category: " ++ category.name ++ " >") ]
                 ]
 
 

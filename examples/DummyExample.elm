@@ -3,7 +3,6 @@ module Main exposing (..)
 import List exposing (..)
 import Html exposing (..)
 import Maybe
-
 import Chae.Id as Id
 import Chae.Node as Node
 import Chae.Tree as Tree

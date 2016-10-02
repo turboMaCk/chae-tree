@@ -1,6 +1,7 @@
 module Chae.Tree
     exposing
         ( Tree
+        , nil
         , map
         , map2
         , zip
@@ -11,7 +12,11 @@ module Chae.Tree
         , subTreeFor
         )
 
-{-| Tree
+{-| Tree is list of nodes.
+Tree is main datastructure this package provides and this module implements the most essential functions
+which really differs from general Rose Tree implementation. Along side with functor functions
+trees support operation like `push`, `subTreeFor` and `fromList`. These functions make it easy to create
+and manipulate trees only by knowing Ids of items.
 
 # Definition
 @docs Tree
@@ -45,45 +50,60 @@ type alias Tree a =
     List (Node.Node a)
 
 
-{-|
+{-| Construct empty tree
+Alias for []
 -}
+nil : Tree a
 nil =
     []
 
 
-{-|
+{-| Map function over tree
+Smilar to `List.map` but working with trees
 -}
 map : (a -> Id) -> (a -> b) -> Tree a -> Tree b
 map getId fc =
     List.map (Node.map getId fc)
 
 
-{-|
+{-| Map function over two trees to produce new tree from both combined
+Similar to `List.map2` but working with trees
 -}
 map2 : (a -> b -> Id) -> (a -> b -> c) -> Tree a -> Tree b -> Tree c
 map2 getId fc =
     List.map2 (Node.map2 getId fc)
 
 
-{-|
+{-| Zip two trees to tree of tupple
+Similar to `List.zip` but working with trees
 -}
 zip : (a -> b -> Id) -> Tree a -> Tree b -> Tree ( a, b )
 zip getId =
     map2 getId (,)
 
 
-{-|
+{-| Reduce Tree by given function
+Similar to `List.foldl` but working with trees
 -}
 reduce : (a -> b -> b) -> b -> Tree a -> b
-reduce reducer b =
-    List.foldl (flip (Node.reduce reducer)) b
+reduce reducer =
+    List.foldl (flip (Node.reduce reducer))
 
 
-{-| Filter
+{-| Filter Tree.
+Similar to `List.filter` but working on trees.
+If parent node do not pass condition its children are no included in result
+
+    tree = [Node.node "5" 5 [ Node.singleton "1" 1, Node.singleton "10" 10 ] ]
+
+    filter ((<) 4) tree == [Node "5" 5 ([Node "10" 10 []])]
+    filter ((<) 6) tree == []
+    filter ((<) 0) tree == tree
+
 -}
 filter : (a -> Bool) -> Tree a -> Tree a
 filter fc =
-    List.foldl
+    List.foldr
         (\(Node.Node id a c) acc ->
             if fc a then
                 (Node.Node id a (filter fc c)) :: acc
@@ -101,17 +121,18 @@ Second argument is `Maybe Id` is ether:
 - `Nothing` => push to root
 - `Just parentId` => push to sub Tree
 
+
     push toId Nothing 1 [] == [Node "1" 1 []]
-    push toId (Just (toId 1)) 2 [ Node.simple 1 [] ] == [Node "1" 1 ([Node "2" 2 []])]
+    push toId (Just (toId 1)) 2 [ Node.singleton "1" 1 ] == [Node "1" 1 ([Node "2" 2 []])]
 -}
 push : (a -> Id) -> Maybe Id -> a -> Tree a -> Tree a
 push getId maybeId item tree =
     case maybeId of
         Just id ->
-            List.map (Node.pushDeep getId id item) tree
+            List.map (Node.pushDeep id (getId item) item) tree
 
         Nothing ->
-            Node.singleton getId item :: tree
+            Node.singleton (getId item) item :: tree
 
 
 {-| Build `Tree` from given list of items.
@@ -174,9 +195,9 @@ Returns tuple containing sub tree and list of ancestors (paratenrs of root `Node
      tree =
         fromList itemId itemParentIds items
 
-     subtreeFor Nothing tree == ([Node "1" { id = 1, name = "first", parentIds = [] } ([Node "2" { id = 2, name = "child", parentIds = [1] } ([Node "3" { id = 3, name = "dep categories", parentIds = [2] } []])])],[])
-     subtreeFor (Just "1") tree == ([Node "2" { id = 2, name = "child", parentIds = [1] } ([Node "3" { id = 3, name = "dep categories", parentIds = [2] } []])],[{ id = 1, name = "first", parentIds = [] }])
-     subtreeFor (Just "2") tree == ([Node "3" { id = 3, name = "dep categories", parentIds = [2] } []],[{ id = 2, name = "child", parentIds = [1] },{ id = 1, name = "first", parentIds = [] }])
+     subTreeFor Nothing tree == (tree, [])
+     subTreeFor (Just "1") tree == ([Node "2" { id = 2, name = "child", parentIds = [1] } ([Node "3" { id = 3, name = "dep categories", parentIds = [2] } []])],[{ id = 1, name = "first", parentIds = [] }])
+     subTreeFor (Just "2") tree == ([Node "3" { id = 3, name = "dep categories", parentIds = [2] } []],[{ id = 2, name = "child", parentIds = [1] },{ id = 1, name = "first", parentIds = [] }])
 -}
 subTreeFor : Maybe Id -> Tree a -> ( Tree a, List a )
 subTreeFor maybeId tree =
