@@ -3,13 +3,16 @@ module Main exposing (..)
 import List exposing (..)
 import Html exposing (..)
 import Maybe
-import ChaeTree as CT
+
+import Chae.Id as Id
+import Chae.Node as Node
+import Chae.Tree as Tree
 
 
 tree1 =
-    CT.push CT.toId Nothing 1 []
-        |> CT.push CT.toId (Just "1") 2
-        |> CT.push CT.toId (Just "2") 3
+    Tree.push Id.toId Nothing 1 []
+        |> Tree.push Id.toId (Just "1") 2
+        |> Tree.push Id.toId (Just "2") 3
 
 
 list =
@@ -17,7 +20,7 @@ list =
 
 
 tree2 =
-    CT.fromList (\a -> CT.toId (.id a)) (\a -> .pid a |> map CT.toId) list
+    Tree.fromList (\a -> Id.toId (.id a)) (\a -> .pid a |> map Id.toId) list
 
 
 main : Html msg
