@@ -1,13 +1,15 @@
 {
     "version": "1.0.0",
-    "summary": "RoseTree like datastructure for building multi level menus",
+    "summary": "Create multi-level navigation in elm easily.",
     "repository": "https://github.com/turbomack/chaetree.git",
     "license": "BSD-3-Clause",
     "source-directories": [
         "src"
     ],
     "exposed-modules": [
-        "ChaeTree"
+        "Chae.Id",
+        "Chae.Node",
+        "Chae.Tree"
     ],
     "dependencies": {
         "elm-lang/core": "4.0.5 <= v < 5.0.0"

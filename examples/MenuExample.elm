@@ -12,7 +12,9 @@ import Maybe
 
 -- Lib import
 
-import ChaeTree as CT
+import Chae.Id as Id exposing (Id)
+import Chae.Node as Node exposing (Node)
+import Chae.Tree as Tree exposing (Tree)
 
 
 type Either a b
@@ -36,42 +38,42 @@ categories : List Category
 categories =
     [ { id = 1, name = "first", parentId = Nothing }
     , { id = 2, name = "child", parentId = Just 1 }
-    , { id = 3, name = "dep categories", parentId = Just 2 }
+    , { id = 3, name = "deep child", parentId = Just 2 }
     ]
 
 
 questions : List Question
 questions =
-    [ { id = 1, name = "root q", categoryIds = [] }
-    , { id = 2, name = "in cat", categoryIds = [ 1 ] }
-    , { id = 3, name = "almost last", categoryIds = [ 2 ] }
-    , { id = 4, name = "last", categoryIds = [ 2, 3 ] }
+    [ { id = 1, name = "root item", categoryIds = [] }
+    , { id = 2, name = "item with parent", categoryIds = [ 1 ] }
+    , { id = 3, name = "deeper nested item", categoryIds = [ 2 ] }
+    , { id = 4, name = "item with two parents", categoryIds = [ 2, 3 ] }
     ]
 
 
-getId : Either Category Question -> CT.Id
+getId : Either Category Question -> Id
 getId thing =
     case thing of
         Left category ->
-            CT.toId (.id category)
+            Id.toId category.id
 
         Right question ->
-            CT.toId (.id question)
+            Id.toId question.id
 
 
-getParentIds : Either Category Question -> List CT.Id
+getParentIds : Either Category Question -> List Id
 getParentIds thing =
     case thing of
         Left category ->
-            case .parentId category of
+            case category.parentId of
                 Just id ->
-                    [ CT.toId id ]
+                    [ Id.toId id ]
 
                 Nothing ->
                     []
 
         Right question ->
-            map (\id -> CT.toId id) (.categoryIds question)
+            map (\id -> Id.toId id) question.categoryIds
 
 
 list : List (Either Category Question)
@@ -79,14 +81,14 @@ list =
     (map (\c -> Left c) categories) ++ map (\q -> Right q) questions
 
 
-tree : CT.Tree (Either Category Question)
+tree : Tree (Either Category Question)
 tree =
-    CT.fromList getId getParentIds list
+    Tree.fromList getId getParentIds list
 
 
 type alias Model =
     { activeCategoryId : Maybe String
-    , tree : CT.Tree (Either Category Question)
+    , tree : Tree (Either Category Question)
     }
 
 
@@ -101,7 +103,7 @@ initialModel =
 
 type Msg
     = NoOp
-    | Open (Maybe CT.Id)
+    | Open (Maybe Id)
 
 
 init : ( Model, Cmd Msg )
@@ -123,20 +125,20 @@ update msg model =
 -- View
 
 
-itemView : CT.Node (Either Category Question) -> Html Msg
+itemView : Node (Either Category Question) -> Html Msg
 itemView node =
-    case CT.unpack node of
+    case Node.root node of
         Right question ->
-            li [] [ text (">> " ++ (.name question)) ]
+            li [] [ text ("item: " ++ (.name question)) ]
 
         Left category ->
             li []
-                [ a [ Events.onClick (Open (Just (CT.getId node))) ]
-                    [ text (.name category ++ " >") ]
+                [ a [ Events.onClick (Open (Just (Node.id node))) ]
+                    [ text ("category: " ++ category.name ++ " >") ]
                 ]
 
 
-menuView : CT.Tree (Either Category Question) -> Html Msg
+menuView : Tree (Either Category Question) -> Html Msg
 menuView list =
     ul []
         (map itemView list)
@@ -148,7 +150,7 @@ ancestorView thing =
         openArg category =
             case (.parentId category) of
                 Just id ->
-                    Just (CT.toId id)
+                    Just (Id.toId id)
 
                 Nothing ->
                     Nothing
@@ -171,7 +173,7 @@ ancestorsView things =
         (map (\c -> ancestorView c) (reverse things))
 
 
-menu : ( CT.Tree (Either Category Question), List (Either Category Question) ) -> Html Msg
+menu : ( Tree (Either Category Question), List (Either Category Question) ) -> Html Msg
 menu ( tree, categories ) =
     div []
         [ ancestorsView categories
@@ -181,7 +183,7 @@ menu ( tree, categories ) =
 
 view : Model -> Html Msg
 view model =
-    menu (CT.subTreeFor (.activeCategoryId model) (.tree model))
+    menu (Tree.subTreeFor model.activeCategoryId model.tree)
 
 
 main : Program Never
