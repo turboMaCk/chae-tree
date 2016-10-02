@@ -9,7 +9,9 @@ import Maybe
 
 -- Lib import
 
-import ChaeTree as CT
+import Chae.Id as Id exposing (Id)
+import Chae.Node as Node exposing (Node)
+import Chae.Tree as Tree exposing (Tree)
 
 
 -- Model
@@ -29,12 +31,12 @@ items =
 
 
 type alias Model =
-    { items : CT.Tree Item, opened : List CT.Id }
+    { items : Tree Item, opened : List Id }
 
 
 initialModel : Model
 initialModel =
-    { items = CT.fromList (.id) (.parentIds) items
+    { items = Tree.fromList (.id) (.parentIds) items
     , opened = map .id items
     }
 
@@ -50,7 +52,7 @@ init =
 
 type Msg
     = NoOp
-    | Toggle (Maybe CT.Id)
+    | Toggle Id
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -59,18 +61,13 @@ update cmd model =
         NoOp ->
             model ! []
 
-        Toggle maybeId ->
-            case maybeId of
-                Nothing ->
-                    model ! []
+        Toggle id ->
+            case partition (\o -> o == id) model.opened of
+                ( [], rest ) ->
+                    { model | opened = id :: rest } ! []
 
-                Just id ->
-                    case partition (\o -> o == id) (.opened model) of
-                        ( [], rest ) ->
-                            { model | opened = id :: rest } ! []
-
-                        ( _, rest ) ->
-                            { model | opened = rest } ! []
+                ( _, rest ) ->
+                    { model | opened = rest } ! []
 
 
 
@@ -78,20 +75,20 @@ update cmd model =
 
 
 isOpened list node =
-    member (CT.getId node) list
+    member (Node.id node) list
 
 
-itemView : Model -> CT.Node Item -> Html Msg
+itemView : Model -> Node Item -> Html Msg
 itemView model node =
     let
         item =
-            CT.unpack node
+            Node.root node
 
         open =
             isOpened (.opened model) node
 
         symbol =
-            if length (CT.getSubTree node) > 0 then
+            if length (Node.children node) > 0 then
                 if open then
                     "[-] "
                 else
@@ -100,16 +97,16 @@ itemView model node =
                 "[ ] "
     in
         li []
-            [ a [ Events.onClick (Toggle (Just (CT.getId node))) ]
-                [ text (symbol ++ (.name item)) ]
+            [ a [ Events.onClick (Toggle (Node.id node)) ]
+                [ text (symbol ++ item.name) ]
             , if open then
-                listView model (CT.getSubTree node)
+                listView model (Node.children node)
               else
                 text ""
             ]
 
 
-listView : Model -> CT.Tree Item -> Html Msg
+listView : Model -> Tree Item -> Html Msg
 listView model items =
     ul []
         (map (\n -> itemView model n) items)

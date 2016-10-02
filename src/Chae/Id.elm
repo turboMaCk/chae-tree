@@ -3,10 +3,10 @@ module Chae.Id exposing (Id, toId)
 {-| This module implements basic `Id` type manipulations
 that are used across other data types.
 
-# Type
+# Definition
 @docs Id
 
-# Essential
+# Constructor
 @docs toId
 
 -}

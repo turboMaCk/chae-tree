@@ -69,9 +69,9 @@ singleton getId item =
 
 {-| Create node manualy
 -}
-node : a -> b -> List (Node b) -> Node b
+node : Id -> b -> List (Node b) -> Node b
 node id a c =
-    Node (toId id) a c
+    Node id a c
 
 
 {-| Get id of given `Node`.
