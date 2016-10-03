@@ -13,7 +13,7 @@ module Chae.Tree
         )
 
 {-| Tree is list of nodes.
-Tree is main datastructure this package provides and this module implements the most essential functions
+Tree is main data structure this package provides and this module implements the most essential functions
 which really differs from general Rose Tree implementation. Along side with functor functions
 trees support operation like `push`, `subTreeFor` and `fromList`. These functions make it easy to create
 and manipulate trees only by knowing Ids of items.
@@ -59,7 +59,7 @@ nil =
 
 
 {-| Map function over tree
-Smilar to `List.map` but working with trees
+Similar to `List.map` but working with trees
 -}
 map : (a -> Id) -> (a -> b) -> Tree a -> Tree b
 map getId fc =
@@ -74,7 +74,7 @@ map2 getId fc =
     List.map2 (Node.map2 getId fc)
 
 
-{-| Zip two trees to tree of tupple
+{-| Zip two trees to tree of tuple
 Similar to `List.zip` but working with trees
 -}
 zip : (a -> b -> Id) -> Tree a -> Tree b -> Tree ( a, b )

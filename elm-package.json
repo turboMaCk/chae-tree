@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "Create multi-level navigation in elm easily.",
-    "repository": "https://github.com/turbomack/chaetree.git",
+    "repository": "https://github.com/turboMaCk/chae-tree.git",
     "license": "BSD-3-Clause",
     "source-directories": [
         "src"

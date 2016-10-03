@@ -18,8 +18,8 @@ module Chae.Node
         )
 
 {-| Node is [Rose Tree](https://en.wikipedia.org/wiki/Rose_tree) like data structure beside it also have its id.
-This Id is essential to some manipulations ChaeTree provides.
-If you're looking for `Rose Tree` you'll better pick some regular implemetation.
+This Id is essential to some manipulations Chae-Tree provides.
+If you're looking for `Rose Tree` you'll better pick some regular implementation.
 Chae Tree is domain specific with focus on building multi level navigation or similar UI elements.
 It's not necessary the best pick if you want to process structural data beside you want to use functions
 like `pushDeep`.
@@ -134,7 +134,7 @@ hasChildren tree =
     children tree |> List.isEmpty |> not
 
 
-{-| Transform node to tupple of `( id, item, children )`
+{-| Transform node to tuple of `( id, item, children )`
 
     toTuple (singleton "1" 1) == ("1",1,[])
     toTuple (node "1" 1 [(singleton "2" 2)]) == ("1",1,[Node "2" 2 []])
@@ -159,7 +159,7 @@ map getId fc (Node _ a c) =
     Node (getId a) (fc a) (List.map (map getId fc) c)
 
 
-{-| Similar to map, but takes two Nodes and produce new one by compinating items of both
+{-| Similar to map, but takes two Nodes and produce new one by combining items of both
 -}
 map2 : (a -> b -> Id) -> (a -> b -> c) -> Node a -> Node b -> Node c
 map2 getId fc (Node _ a ca) (Node _ b cb) =
