@@ -103,14 +103,18 @@ If parent node do not pass condition its children are no included in result
 -}
 filter : (a -> Bool) -> Tree a -> Tree a
 filter fc =
-    List.foldr
-        (\(Node.Node id a c) acc ->
-            if fc a then
-                (Node.Node id a (filter fc c)) :: acc
-            else
-                acc
-        )
-        []
+    let
+        sieve node acc =
+            let
+                ( id, a, c ) =
+                    Node.toTuple node
+            in
+                if fc a then
+                    (Node.node id a (filter fc c)) :: acc
+                else
+                    acc
+    in
+        List.foldr sieve []
 
 
 {-| Produce new tree with given item pushed under its parent.

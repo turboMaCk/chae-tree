@@ -1,6 +1,6 @@
 module Chae.Node
     exposing
-        ( Node(..)
+        ( Node
         , singleton
         , node
         , id
