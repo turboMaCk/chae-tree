@@ -1,5 +1,7 @@
 # Chae-Tree
 
+[![Build Status](https://travis-ci.org/turboMaCk/chae-tree.svg?branch=master)](https://travis-ci.org/turboMaCk/chae-tree)
+
 Create multi-level navigation in elm easily.
 
 This package provides essential abstractions for manipulating and creating tree data structure directly from your collection data.
