@@ -182,7 +182,7 @@ First argument is `Maybe Id` is ether:
 - `Nothing` => result is given tree (with empty ancestors `List`).
 - `Just parentId` => result is sub tree for node with `id == parentId`.
 
-Returns tuple containing sub tree and list of ancestors (paratenrs of root `Node`).
+Returns tuple containing sub tree and list of ancestors of `Node`.
 
     items =
         [ { id = 1, name = "first", parentIds = [] }
@@ -214,33 +214,33 @@ subTreeFor maybeId tree =
 
 
 subTreeFor' : Id -> ( Tree a, List a ) -> ( Tree a, List a )
-subTreeFor' id ( tree, accestors ) =
+subTreeFor' id ( tree, ancestors ) =
     let
         matches =
             List.filter (\n -> Node.id n == id) tree
 
-        subMatches node =
+        nest node =
             let
                 ( _, item, children ) =
                     Node.toTuple node
             in
-                subTreeFor' id ( children, item :: accestors )
+                ( children, item :: ancestors )
     in
         case (List.head matches) of
             Just node ->
-                let
-                    ( _, item, children ) =
-                        Node.toTuple node
-                in
-                    ( children, item :: accestors )
+                nest node
 
             Nothing ->
                 List.foldr
                     (\child acc ->
-                        if (List.length (subMatches child |> fst)) > 0 then
-                            subMatches child
-                        else
-                            acc
+                        let
+                            subMatches =
+                                subTreeFor' id (nest child)
+                        in
+                            if List.isEmpty (subMatches |> snd) then
+                                acc
+                            else
+                                subMatches
                     )
                     ( [], [] )
                     tree
