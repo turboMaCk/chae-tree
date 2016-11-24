@@ -237,10 +237,10 @@ subTreeFor' id ( tree, ancestors ) =
                             subMatches =
                                 subTreeFor' id (nest child)
                         in
-                            if (List.length (subMatches |> snd)) > 0 then
-                                subMatches
-                            else
+                            if List.isEmpty (subMatches |> snd) then
                                 acc
+                            else
+                                subMatches
                     )
                     ( [], [] )
                     tree
