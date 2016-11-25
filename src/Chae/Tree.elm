@@ -182,7 +182,7 @@ First argument is `Maybe Id` is ether:
 - `Nothing` => result is given tree (with empty ancestors `List`).
 - `Just parentId` => result is sub tree for node with `id == parentId`.
 
-Returns tuple containing sub tree and list of ancestors (paratenrs of root `Node`).
+Returns tuple containing sub tree and list of ancestors of that sub tree (from parent to root).
 
     items =
         [ { id = 1, name = "first", parentIds = [] }
