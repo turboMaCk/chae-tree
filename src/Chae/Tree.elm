@@ -146,7 +146,7 @@ Second argument is function from item to `List Id/List String`.
     items =
         [ { id = 1, name = "first", parentIds = [] }
         , { id = 2, name = "child", parentIds = [1] }
-        , { id = 3, name = "dep categories", parentIds = [2] }
+        , { id = 3, name = "deep child", parentIds = [2] }
         ]
 
      itemId item =
@@ -155,7 +155,7 @@ Second argument is function from item to `List Id/List String`.
      itemParentIds item =
          .parentIds item |> List.map toId
 
-     fromList itemId itemParentIds items == [Node "1" { id = 1, name = "first", parentIds = [] } ([Node "2" { id = 2, name = "child", parentIds = [1] } ([Node "3" { id = 3, name = "dep categories", parentIds = [2] } []])])]
+     fromList itemId itemParentIds items == [Node "1" { id = 1, name = "first", parentIds = [] } ([Node "2" { id = 2, name = "child", parentIds = [1] } ([Node "3" { id = 3, name = "deep child", parentIds = [2] } []])])]
 -}
 fromList : (a -> Id) -> (a -> List Id) -> List a -> Tree a
 fromList getId getParentId list =

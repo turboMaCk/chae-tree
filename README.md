@@ -46,7 +46,7 @@ Thanks to this `Chae.Tree` allows you to have multiple nodes in root.
 For example think about collection of categories where every category can have multiple sub-categories.
 In that case `Tree` is actual collection and every category is one `Node` in that tree.
 
-## Chae.Node is not Rose Tree Neither
+## Chae.Node is not Rose Tree Either
 
 Now you might be thinking that if `Tree` is just an alias for `List (Node a)` than `Node a` is actually a Rose Tree.
 You're partially right! In fact `Node` is pretty close to Rose Tree definition which might look like:
