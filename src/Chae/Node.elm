@@ -42,7 +42,6 @@ like `pushDeep`.
 -}
 
 import List
-import Maybe exposing (Maybe(..))
 import Chae.Id exposing (..)
 
 

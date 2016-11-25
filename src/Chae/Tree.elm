@@ -34,6 +34,7 @@ and manipulate trees only by knowing Ids of items.
 @docs map, map2, zip, reduce, filter
 
 -}
+import Tuple
 
 import List
 import Chae.Id exposing (..)
