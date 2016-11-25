@@ -1,0 +1,35 @@
+{
+  "name": "chae-tree",
+  "version": "1.0.2",
+  "description": "Create multi level navigation in elm easily.",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "tests"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "elm-test": "0.17.1"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/elm-test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/turboMaCk/chae-tree.git"
+  },
+  "keywords": [
+    "Elm",
+    "Tree",
+    "Rose",
+    "Tree",
+    "Chae",
+    "Navigation"
+  ],
+  "author": "Marek Fajkus",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/turboMaCk/chae-tree/issues"
+  },
+  "homepage": "https://github.com/turboMaCk/chae-tree#readme"
+}
