@@ -2,7 +2,6 @@ module Tests exposing (..)
 
 import Test exposing (..)
 import Expect
-import String
 import Chae.Tree exposing (..)
 import Chae.Node exposing (node)
 

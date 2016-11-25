@@ -5,7 +5,6 @@ module Main exposing (..)
 
 import List exposing (..)
 import Html exposing (..)
-import Html.App
 import Html.Events as Events
 import Maybe
 
@@ -73,12 +72,12 @@ getParentIds thing =
                     []
 
         Right question ->
-            map (\id -> Id.toId id) question.categoryIds
+            List.map (\id -> Id.toId id) question.categoryIds
 
 
 list : List (Either Category Question)
 list =
-    (map (\c -> Left c) categories) ++ map (\q -> Right q) questions
+    (List.map (\c -> Left c) categories) ++ List.map (\q -> Right q) questions
 
 
 tree : Tree (Either Category Question)
@@ -141,7 +140,7 @@ itemView node =
 menuView : Tree (Either Category Question) -> Html Msg
 menuView list =
     ul []
-        (map itemView list)
+        (List.map itemView list)
 
 
 ancestorView : Either Category Question -> Html Msg
@@ -170,7 +169,7 @@ ancestorView thing =
 ancestorsView : List (Either Category Question) -> Html Msg
 ancestorsView things =
     ul []
-        (map (\c -> ancestorView c) (reverse things))
+        (List.map (\c -> ancestorView c) (reverse things))
 
 
 menu : ( Tree (Either Category Question), List (Either Category Question) ) -> Html Msg
@@ -186,9 +185,9 @@ view model =
     menu (Tree.subTreeFor model.activeCategoryId model.tree)
 
 
-main : Program Never
+main : Program Never Model Msg
 main =
-    Html.App.program
+    Html.program
         { init = init
         , update = update
         , view = view
