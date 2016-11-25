@@ -1,6 +1,6 @@
 {
   "name": "chae-tree",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Create multi level navigation in elm easily.",
   "main": "index.js",
   "directories": {
