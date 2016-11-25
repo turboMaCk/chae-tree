@@ -1,7 +1,6 @@
 module Tests exposing (all)
 
 import Test exposing (..)
-import List
 import Tests.Tree
 
 
