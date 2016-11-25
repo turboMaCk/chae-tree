@@ -159,11 +159,11 @@ Second argument is function from item to `List Id/List String`.
 -}
 fromList : (a -> Id) -> (a -> List Id) -> List a -> Tree a
 fromList getId getParentId list =
-    fromList' getId getParentId list Nothing
+    fromList_ getId getParentId list Nothing
 
 
-fromList' : (a -> Id) -> (a -> List Id) -> List a -> Maybe Id -> Tree a
-fromList' getId getParentId list maybeId =
+fromList_ : (a -> Id) -> (a -> List Id) -> List a -> Maybe Id -> Tree a
+fromList_ getId getParentId list maybeId =
     let
         children =
             case maybeId of
@@ -173,7 +173,7 @@ fromList' getId getParentId list maybeId =
                 Just id ->
                     List.filter (\item -> List.member id (getParentId item)) list
     in
-        List.map (\i -> Node.node (getId i) i (fromList' getId getParentId list (Just (getId i)))) children
+        List.map (\i -> Node.node (getId i) i (fromList_ getId getParentId list (Just (getId i)))) children
 
 
 {-| Returns sub `Tree` and ancestors for given `Id` and `Tree`.
@@ -182,7 +182,7 @@ First argument is `Maybe Id` is ether:
 - `Nothing` => result is given tree (with empty ancestors `List`).
 - `Just parentId` => result is sub tree for node with `id == parentId`.
 
-Returns tuple containing sub tree and list of ancestors of `Node`.
+Returns tuple containing sub tree and list of ancestors of that sub tree (from parent to root).
 
     items =
         [ { id = 1, name = "first", parentIds = [] }
@@ -207,14 +207,14 @@ subTreeFor : Maybe Id -> Tree a -> ( Tree a, List a )
 subTreeFor maybeId tree =
     case maybeId of
         Just id ->
-            subTreeFor' id ( tree, [] )
+            subTreeFor_ id ( tree, [] )
 
         Nothing ->
             ( tree, [] )
 
 
-subTreeFor' : Id -> ( Tree a, List a ) -> ( Tree a, List a )
-subTreeFor' id ( tree, ancestors ) =
+subTreeFor_ : Id -> ( Tree a, List a ) -> ( Tree a, List a )
+subTreeFor_ id ( tree, ancestors ) =
     let
         matches =
             List.filter (\n -> Node.id n == id) tree
@@ -235,9 +235,9 @@ subTreeFor' id ( tree, ancestors ) =
                     (\child acc ->
                         let
                             subMatches =
-                                subTreeFor' id (nest child)
+                                subTreeFor_ id (nest child)
                         in
-                            if List.isEmpty (subMatches |> snd) then
+                            if List.isEmpty (subMatches |> Tuple.second) then
                                 acc
                             else
                                 subMatches

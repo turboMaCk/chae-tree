@@ -2,7 +2,6 @@ module Main exposing (..)
 
 import List exposing (..)
 import Html exposing (..)
-import Html.App
 import Html.Events as Events
 import Maybe
 
@@ -37,7 +36,7 @@ type alias Model =
 initialModel : Model
 initialModel =
     { items = Tree.fromList (.id) (.parentIds) items
-    , opened = map .id items
+    , opened = List.map .id items
     }
 
 
@@ -109,7 +108,7 @@ itemView model node =
 listView : Model -> Tree Item -> Html Msg
 listView model items =
     ul []
-        (map (\n -> itemView model n) items)
+        (List.map (\n -> itemView model n) items)
 
 
 view : Model -> Html Msg
@@ -117,9 +116,9 @@ view model =
     listView model (.items model)
 
 
-main : Program Never
+main : Program Never Model Msg
 main =
-    Html.App.program
+    Html.program
         { init = init
         , update = update
         , view = view

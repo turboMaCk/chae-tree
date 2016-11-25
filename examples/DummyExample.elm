@@ -19,7 +19,7 @@ list =
 
 
 tree2 =
-    Tree.fromList (\a -> Id.toId (.id a)) (\a -> .pid a |> map Id.toId) list
+    Tree.fromList (\a -> Id.toId (.id a)) (\a -> .pid a |> List.map Id.toId) list
 
 
 main : Html msg

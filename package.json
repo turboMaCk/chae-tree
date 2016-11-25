@@ -9,7 +9,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "elm-test": "0.17.1"
+    "elm-test": "0.18.0"
   },
   "scripts": {
     "test": "./node_modules/.bin/elm-test"
