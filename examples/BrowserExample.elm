@@ -3,7 +3,6 @@ module Main exposing (..)
 import List exposing (..)
 import Html exposing (..)
 import Html.Events as Events
-import Maybe
 
 
 -- Lib import
@@ -73,6 +72,7 @@ update cmd model =
 -- View
 
 
+isOpened : List Id -> Node a -> Bool
 isOpened list node =
     member (Node.id node) list
 
