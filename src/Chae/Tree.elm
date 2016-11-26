@@ -62,7 +62,11 @@ nil =
 {-| Map function over tree
 Similar to `List.map` but working with trees
 -}
-map : (a -> Id) -> (a -> b) -> Tree a -> Tree b
+map :
+    (a -> Id)
+    -> (a -> b)
+    -> Tree a
+    -> Tree b
 map getId fc =
     List.map (Node.map getId fc)
 
@@ -70,7 +74,12 @@ map getId fc =
 {-| Map function over two trees to produce new tree from both combined
 Similar to `List.map2` but working with trees
 -}
-map2 : (a -> b -> Id) -> (a -> b -> c) -> Tree a -> Tree b -> Tree c
+map2 :
+    (a -> b -> Id)
+    -> (a -> b -> c)
+    -> Tree a
+    -> Tree b
+    -> Tree c
 map2 getId fc =
     List.map2 (Node.map2 getId fc)
 
@@ -78,7 +87,11 @@ map2 getId fc =
 {-| Zip two trees to tree of tuple
 Similar to `List.zip` but working with trees
 -}
-zip : (a -> b -> Id) -> Tree a -> Tree b -> Tree ( a, b )
+zip :
+    (a -> b -> Id)
+    -> Tree a
+    -> Tree b
+    -> Tree ( a, b )
 zip getId =
     map2 getId (,)
 
@@ -86,7 +99,11 @@ zip getId =
 {-| Reduce Tree by given function
 Similar to `List.foldl` but working with trees
 -}
-reduce : (a -> b -> b) -> b -> Tree a -> b
+reduce :
+    (a -> b -> b)
+    -> b
+    -> Tree a
+    -> b
 reduce reducer =
     List.foldl (flip (Node.reduce reducer))
 
@@ -102,7 +119,10 @@ If parent node do not pass condition its children are no included in result
     filter ((<) 0) tree == tree
 
 -}
-filter : (a -> Bool) -> Tree a -> Tree a
+filter :
+    (a -> Bool)
+    -> Tree a
+    -> Tree a
 filter fc =
     let
         sieve node acc =
@@ -130,7 +150,12 @@ Second argument is `Maybe Id` is ether:
     push toId Nothing 1 [] == [Node "1" 1 []]
     push toId (Just (toId 1)) 2 [ Node.singleton "1" 1 ] == [Node "1" 1 ([Node "2" 2 []])]
 -}
-push : (a -> Id) -> Maybe Id -> a -> Tree a -> Tree a
+push :
+    (a -> Id)
+    -> Maybe Id
+    -> a
+    -> Tree a
+    -> Tree a
 push getId maybeId item tree =
     case maybeId of
         Nothing ->
@@ -158,12 +183,21 @@ Second argument is function from item to `List Id/List String`.
 
      fromList itemId itemParentIds items == [Node "1" { id = 1, name = "first", parentIds = [] } ([Node "2" { id = 2, name = "child", parentIds = [1] } ([Node "3" { id = 3, name = "deep child", parentIds = [2] } []])])]
 -}
-fromList : (a -> Id) -> (a -> List Id) -> List a -> Tree a
+fromList :
+    (a -> Id)
+    -> (a -> List Id)
+    -> List a
+    -> Tree a
 fromList getId getParentId list =
     fromList_ getId getParentId list Nothing
 
 
-fromList_ : (a -> Id) -> (a -> List Id) -> List a -> Maybe Id -> Tree a
+fromList_ :
+    (a -> Id)
+    -> (a -> List Id)
+    -> List a
+    -> Maybe Id
+    -> Tree a
 fromList_ getId getParentId list maybeId =
     let
         children =
@@ -204,7 +238,10 @@ Returns tuple containing sub tree and list of ancestors of that sub tree (from p
      subTreeFor (Just "1") tree == ([Node "2" { id = 2, name = "child", parentIds = [1] } ([Node "3" { id = 3, name = "dep categories", parentIds = [2] } []])],[{ id = 1, name = "first", parentIds = [] }])
      subTreeFor (Just "2") tree == ([Node "3" { id = 3, name = "dep categories", parentIds = [2] } []],[{ id = 2, name = "child", parentIds = [1] },{ id = 1, name = "first", parentIds = [] }])
 -}
-subTreeFor : Maybe Id -> Tree a -> ( Tree a, List a )
+subTreeFor :
+    Maybe Id
+    -> Tree a
+    -> ( Tree a, List a )
 subTreeFor maybeId tree =
     case maybeId of
         Just id ->
@@ -214,7 +251,10 @@ subTreeFor maybeId tree =
             ( tree, [] )
 
 
-subTreeFor_ : Id -> ( Tree a, List a ) -> ( Tree a, List a )
+subTreeFor_ :
+    Id
+    -> ( Tree a, List a )
+    -> ( Tree a, List a )
 subTreeFor_ id ( tree, ancestors ) =
     let
         matches =

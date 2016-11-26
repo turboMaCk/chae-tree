@@ -153,28 +153,44 @@ produces new modified tree
    map toId ((+) 1) (addChild "2" 2 (singleton "1" 1)) == Node "1" 2 ([Node "2" 3 []])
    map (\n -> n + 1 |> toId) ((+) 1) (addChild "2" 2 (singleton "1" 1)) == Node "2" 2 ([Node "3" 3 []])
 -}
-map : (a -> Id) -> (a -> b) -> Node a -> Node b
+map :
+    (a -> Id)
+    -> (a -> b)
+    -> Node a
+    -> Node b
 map getId fc (Node _ a c) =
     Node (getId a) (fc a) (List.map (map getId fc) c)
 
 
 {-| Similar to map, but takes two Nodes and produce new one by combining items of both
 -}
-map2 : (a -> b -> Id) -> (a -> b -> c) -> Node a -> Node b -> Node c
+map2 :
+    (a -> b -> Id)
+    -> (a -> b -> c)
+    -> Node a
+    -> Node b
+    -> Node c
 map2 getId fc (Node _ a ca) (Node _ b cb) =
     Node (getId a b) (fc a b) (List.map2 (map2 getId fc) ca cb)
 
 
 {-| Similar to `List.zip` but working with Node
 -}
-zip : (a -> b -> Id) -> Node a -> Node b -> Node ( a, b )
+zip :
+    (a -> b -> Id)
+    -> Node a
+    -> Node b
+    -> Node ( a, b )
 zip getId =
     map2 getId (,)
 
 
 {-| Flatten Node of Nodes to Node.
 -}
-flatten : (Id -> Id -> Id) -> Node (Node a) -> Node a
+flatten :
+    (Id -> Id -> Id)
+    -> Node (Node a)
+    -> Node a
 flatten getId (Node id1 (Node id2 a c) cs) =
     Node (getId id1 id2) a (c ++ List.map (flatten getId) cs)
 
@@ -186,7 +202,11 @@ flatten getId (Node id1 (Node id2 a c) cs) =
     flatMap toId (\a -> node "2" (a * 2) []) n == Node "1" 2 ([Node "2" 4 [],Node "3" 6 ([Node "4" 8 []])])
     flatMap toId (\a -> node "2" (a *2) [node  "1" (a * 3) []]) m == Node "1" 2 ([Node "1" 3 [],Node "2" 4 ([Node "1" 6 []]),Node "3" 6 ([Node "1" 9 [],Node "4" 8 ([Node "1" 12 []])])])
 -}
-flatMap : (a -> Id) -> (a -> Node b) -> Node a -> Node b
+flatMap :
+    (a -> Id)
+    -> (a -> Node b)
+    -> Node a
+    -> Node b
 flatMap getId fc =
     map getId fc >> (flatten (\aid _ -> aid))
 
@@ -196,7 +216,11 @@ flatMap getId fc =
     reduce (+) 0 (addChild "20" 20 (singleton "1" 1)) == 21
     reduce (*) 1 (addChild "3" 3 (singleton "4" 4)) == 12
 -}
-reduce : (a -> b -> b) -> b -> Node a -> b
+reduce :
+    (a -> b -> b)
+    -> b
+    -> Node a
+    -> b
 reduce reducer b (Node _ a c) =
     List.foldl (flip (reduce reducer)) (reducer a b) c
 
@@ -207,7 +231,12 @@ reduce reducer b (Node _ a c) =
 
     pushDeep "4" "10" 10 n == Node "1" 1 ([Node "2" 2 [],Node "3" 3 ([Node "4" 4 ([Node "10" 10 []])])])
 -}
-pushDeep : Id -> Id -> a -> Node a -> Node a
+pushDeep :
+    Id
+    -> Id
+    -> a
+    -> Node a
+    -> Node a
 pushDeep id aid item ((Node nodeId a children) as node) =
     if nodeId == id then
         addChild aid item node
