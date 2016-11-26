@@ -34,8 +34,8 @@ and manipulate trees only by knowing Ids of items.
 @docs map, map2, zip, reduce, filter
 
 -}
-import Tuple
 
+import Tuple
 import List
 import Chae.Id exposing (..)
 import Chae.Node as Node
@@ -133,11 +133,11 @@ Second argument is `Maybe Id` is ether:
 push : (a -> Id) -> Maybe Id -> a -> Tree a -> Tree a
 push getId maybeId item tree =
     case maybeId of
-        Just id ->
-            List.map (Node.pushDeep id (getId item) item) tree
-
         Nothing ->
             Node.singleton (getId item) item :: tree
+
+        Just id ->
+            List.map (Node.pushDeep id (getId item) item) tree
 
 
 {-| Build `Tree` from given list of items.

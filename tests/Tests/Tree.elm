@@ -7,8 +7,8 @@ import String
 
 -- Library
 
-import Chae.Tree exposing (..)
-import Chae.Node exposing (node)
+import Chae.Tree as Tree exposing (..)
+import Chae.Node as Node exposing (node)
 
 
 -- Exposed
@@ -17,7 +17,9 @@ import Chae.Node exposing (node)
 all : Test
 all =
     describe "Tree"
-        [ fromListTest
+        [ filterTest
+        , pushTest
+        , fromListTest
         , subTreeForTests
         ]
 
@@ -50,7 +52,90 @@ tree =
 
 
 
--- Test
+-- Tests
+
+
+filterTest : Test
+filterTest =
+    let
+        tree =
+            [ Node.node "5" 5 [ Node.singleton "1" 1, Node.singleton "10" 10 ] ]
+    in
+        describe "filter"
+            [ test "< 4" <|
+                \() ->
+                    Expect.equal
+                        (Tree.filter ((<) 4) tree)
+                        ([ node "5" 5 [ node "10" 10 [] ] ])
+            , test "< 6" <|
+                \() ->
+                    Expect.equal
+                        (Tree.filter ((<) 6) tree)
+                        []
+            , test "< 0" <|
+                \() ->
+                    Expect.equal
+                        (Tree.filter ((<) 0) tree)
+                        tree
+            ]
+
+
+pushTest : Test
+pushTest =
+    describe "push"
+        [ test "to empty" <|
+            \() ->
+                Expect.equal
+                    (push toString Nothing 4 [])
+                    ([ node "4" 4 [] ])
+        , test "to root of existing" <|
+            \() ->
+                let
+                    item =
+                        { id = 4, name = "new", parentIds = [] }
+                in
+                    Expect.equal
+                        (Tree.filter (\i -> i.id == 4) <| push itemId Nothing item tree)
+                        ([ node "4" item [] ])
+        , test "to deep level" <|
+            \() ->
+                let
+                    item =
+                        { id = 4, name = "new", parentIds = [ 3 ] }
+                in
+                    Expect.equal
+                        (push itemId (Just "3") item tree)
+                        ([ node
+                            "1"
+                            { id = 1
+                            , name = "first"
+                            , parentIds = []
+                            }
+                            [ node
+                                "2"
+                                { id = 2
+                                , name = "child"
+                                , parentIds = [ 1 ]
+                                }
+                                [ node
+                                    "3"
+                                    { id = 3
+                                    , name = "deep child"
+                                    , parentIds = [ 2 ]
+                                    }
+                                    [ node
+                                        "4"
+                                        { id = 4
+                                        , name = "new"
+                                        , parentIds = [ 3 ]
+                                        }
+                                        []
+                                    ]
+                                ]
+                            ]
+                         ]
+                        )
+        ]
 
 
 fromListTest : Test

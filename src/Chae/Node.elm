@@ -75,8 +75,8 @@ singleton id item =
     node "1" 1 [ node "2" 2 [] ] == Node "1" 1 ([Node "2" 2 []])
 -}
 node : Id -> b -> List (Node b) -> Node b
-node id a c =
-    Node id a c
+node =
+    Node
 
 
 {-| Get id of given `Node`.
