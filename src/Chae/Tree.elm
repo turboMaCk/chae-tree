@@ -45,8 +45,7 @@ import Maybe exposing (Maybe(..))
 -- Types
 
 
-{-| Tree
--}
+{-| -}
 type alias Tree a =
     List (Node.Node a)
 

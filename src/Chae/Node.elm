@@ -48,8 +48,7 @@ import Chae.Id exposing (..)
 -- Types
 
 
-{-| Node
--}
+{-| -}
 type Node a
     = Node Id a (List (Node a))
 
@@ -150,7 +149,7 @@ toTuple (Node id a c) =
 {-| Map function on tree
 produces new modified tree
 
-   map ((+) 1) (addChild "2" 2 (singleton "1" 1)) == Node "1" 2 ([Node "2" 3 []])
+    map ((+) 1) (addChild "2" 2 (singleton "1" 1)) == Node "1" 2 ([Node "2" 3 []])
 -}
 map : (a -> b) -> Node a -> Node b
 map fc (Node id a c) =
