@@ -1,6 +1,6 @@
 module Chae.Node
     exposing
-        ( Node
+        ( Node(..)
         , singleton
         , node
         , id
@@ -12,7 +12,7 @@ module Chae.Node
         , map
         , map2
         , flatten
-          -- , flatMap
+        , flatMap
         , reduce
         , pushDeep
         )
@@ -69,7 +69,7 @@ singleton id item =
     Node id item []
 
 
-{-| Create node. Alias for Node constructor
+{-| Create node. Alias for Node constructor (which was opaque in previous releases)
 
     node "1" 1 [] == Node "1" 1 []
     node "1" 1 [ node "2" 2 [] ] == Node "1" 1 ([Node "2" 2 []])
