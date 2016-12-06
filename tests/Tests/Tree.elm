@@ -19,6 +19,7 @@ all =
     describe "Tree"
         [ functorTest
         , filterTest
+        , filterOrTest
         , pushTest
         , fromListTest
         , subTreeForTests
@@ -100,6 +101,31 @@ filterTest =
                 \() ->
                     Expect.equal
                         (Tree.filter ((<) 0) tree)
+                        tree
+            ]
+
+
+filterOrTest : Test
+filterOrTest =
+    let
+        tree =
+            [ Node.node "5" 5 [ Node.node "1" 1 [ Node.singleton "9" 9 ], Node.singleton "10" 10 ] ]
+    in
+        describe "filter node OR children"
+            [ test "< 6" <|
+                \() ->
+                    Expect.equal
+                        (Tree.filterOr ((<) 6) tree)
+                        ([Node.node "5" 5 ([Node.node "1" 1 ([Node.node "9" 9 []]),Node.node "10" 10 []])])
+            , test "< 11" <|
+                \() ->
+                    Expect.equal
+                        (Tree.filterOr ((<) 11) tree)
+                        []
+            , test "< 0" <|
+                \() ->
+                    Expect.equal
+                        (Tree.filterOr ((<) 0) tree)
                         tree
             ]
 
