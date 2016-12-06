@@ -45,8 +45,7 @@ import Maybe exposing (Maybe(..))
 -- Types
 
 
-{-| Tree
--}
+{-| -}
 type alias Tree a =
     List (Node.Node a)
 
@@ -62,38 +61,29 @@ nil =
 {-| Map function over tree
 Similar to `List.map` but working with trees
 -}
-map :
-    (a -> Id)
-    -> (a -> b)
-    -> Tree a
-    -> Tree b
-map getId fc =
-    List.map (Node.map getId fc)
+map : (a -> b) -> Tree a -> Tree b
+map fc =
+    List.map (Node.map fc)
 
 
 {-| Map function over two trees to produce new tree from both combined
 Similar to `List.map2` but working with trees
 -}
 map2 :
-    (a -> b -> Id)
-    -> (a -> b -> c)
+    (a -> b -> c)
     -> Tree a
     -> Tree b
     -> Tree c
-map2 getId fc =
-    List.map2 (Node.map2 getId fc)
+map2 fc =
+    List.map2 (Node.map2 fc)
 
 
 {-| Zip two trees to tree of tuple
 Similar to `List.zip` but working with trees
 -}
-zip :
-    (a -> b -> Id)
-    -> Tree a
-    -> Tree b
-    -> Tree ( a, b )
-zip getId =
-    map2 getId (,)
+zip : Tree a -> Tree b -> Tree ( a, b )
+zip =
+    map2 (,)
 
 
 {-| Reduce Tree by given function

@@ -1,6 +1,6 @@
 module Chae.Node
     exposing
-        ( Node
+        ( Node(..)
         , singleton
         , node
         , id
@@ -48,8 +48,7 @@ import Chae.Id exposing (..)
 -- Types
 
 
-{-| Node
--}
+{-| -}
 type Node a
     = Node Id a (List (Node a))
 
@@ -69,7 +68,7 @@ singleton id item =
     Node id item []
 
 
-{-| Create node. Alias for Node constructor
+{-| Create node. Alias for Node constructor (which was opaque in previous releases)
 
     node "1" 1 [] == Node "1" 1 []
     node "1" 1 [ node "2" 2 [] ] == Node "1" 1 ([Node "2" 2 []])
@@ -150,65 +149,48 @@ toTuple (Node id a c) =
 {-| Map function on tree
 produces new modified tree
 
-   map toId ((+) 1) (addChild "2" 2 (singleton "1" 1)) == Node "1" 2 ([Node "2" 3 []])
-   map (\n -> n + 1 |> toId) ((+) 1) (addChild "2" 2 (singleton "1" 1)) == Node "2" 2 ([Node "3" 3 []])
+    map ((+) 1) (addChild "2" 2 (singleton "1" 1)) == Node "1" 2 ([Node "2" 3 []])
 -}
-map :
-    (a -> Id)
-    -> (a -> b)
-    -> Node a
-    -> Node b
-map getId fc (Node _ a c) =
-    Node (getId a) (fc a) (List.map (map getId fc) c)
+map : (a -> b) -> Node a -> Node b
+map fc (Node id a c) =
+    Node id (fc a) (List.map (map fc) c)
 
 
 {-| Similar to map, but takes two Nodes and produce new one by combining items of both
 -}
 map2 :
-    (a -> b -> Id)
-    -> (a -> b -> c)
+    (a -> b -> c)
     -> Node a
     -> Node b
     -> Node c
-map2 getId fc (Node _ a ca) (Node _ b cb) =
-    Node (getId a b) (fc a b) (List.map2 (map2 getId fc) ca cb)
+map2 fc (Node id a ca) (Node _ b cb) =
+    Node id (fc a b) (List.map2 (map2 fc) ca cb)
 
 
 {-| Similar to `List.zip` but working with Node
 -}
-zip :
-    (a -> b -> Id)
-    -> Node a
-    -> Node b
-    -> Node ( a, b )
-zip getId =
-    map2 getId (,)
+zip : Node a -> Node b -> Node ( a, b )
+zip =
+    map2 (,)
 
 
 {-| Flatten Node of Nodes to Node.
 -}
-flatten :
-    (Id -> Id -> Id)
-    -> Node (Node a)
-    -> Node a
-flatten getId (Node id1 (Node id2 a c) cs) =
-    Node (getId id1 id2) a (c ++ List.map (flatten getId) cs)
+flatten : Node (Node a) -> Node a
+flatten (Node id (Node id2 a c) cs) =
+    Node id a (c ++ List.map flatten cs)
 
 
 {-| Map and flatten
 
     n = node "1" 1 [ node "2" 2 [], node "3" 3 [ node "4" 4 []]]
 
-    flatMap toId (\a -> node "2" (a * 2) []) n == Node "1" 2 ([Node "2" 4 [],Node "3" 6 ([Node "4" 8 []])])
-    flatMap toId (\a -> node "2" (a *2) [node  "1" (a * 3) []]) m == Node "1" 2 ([Node "1" 3 [],Node "2" 4 ([Node "1" 6 []]),Node "3" 6 ([Node "1" 9 [],Node "4" 8 ([Node "1" 12 []])])])
+    flatMap (\a -> node "2" (a * 2) []) n == Node "1" 2 ([Node "2" 4 [],Node "3" 6 ([Node "4" 8 []])])
+    flatMap (\a -> node "2" (a * 2) [ node  "1" (a * 3) [] ] ) m == Node "1" 2 ([Node "1" 3 [],Node "2" 4 ([Node "1" 6 []]),Node "3" 6 ([Node "1" 9 [],Node "4" 8 ([Node "1" 12 []])])])
 -}
-flatMap :
-    (a -> Id)
-    -> (a -> Node b)
-    -> Node a
-    -> Node b
-flatMap getId fc =
-    map getId fc >> (flatten (\aid _ -> aid))
+flatMap : (a -> Node b) -> Node a -> Node b
+flatMap fc =
+    map fc >> flatten
 
 
 {-| Reduce Node by given function. Similar to `List.foldr`
@@ -216,11 +198,7 @@ flatMap getId fc =
     reduce (+) 0 (addChild "20" 20 (singleton "1" 1)) == 21
     reduce (*) 1 (addChild "3" 3 (singleton "4" 4)) == 12
 -}
-reduce :
-    (a -> b -> b)
-    -> b
-    -> Node a
-    -> b
+reduce : (a -> b -> b) -> b -> Node a -> b
 reduce reducer b (Node _ a c) =
     List.foldl (flip (reduce reducer)) (reducer a b) c
 

@@ -17,7 +17,8 @@ import Chae.Node as Node exposing (node)
 all : Test
 all =
     describe "Tree"
-        [ filterTest
+        [ functorTest
+        , filterTest
         , pushTest
         , fromListTest
         , subTreeForTests
@@ -53,6 +54,29 @@ tree =
 
 
 -- Tests
+
+
+functorTest : Test
+functorTest =
+    describe "Act like functor"
+        [ test "1st law" <|
+            \() ->
+                Expect.equal
+                    (Tree.map identity tree)
+                    (identity tree)
+        , test "2nd law" <|
+            \() ->
+                let
+                    fc1 =
+                        toString
+
+                    fc2 str =
+                        "Hi " ++ str
+                in
+                    Expect.equal
+                        (Tree.map (fc2 << fc1) tree)
+                        (Tree.map fc1 tree |> Tree.map fc2)
+        ]
 
 
 filterTest : Test
