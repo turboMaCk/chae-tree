@@ -14,6 +14,8 @@ module Chae.Node
         , flatten
         , flatMap
         , reduce
+        , pure
+        , andMap
         , pushDeep
         )
 
@@ -39,6 +41,9 @@ like `pushDeep`.
 # Map - Reduce
 @docs map, map2, flatten, flatMap, reduce
 
+# Applicative
+@docs pure, andMap
+
 -}
 
 import List
@@ -60,12 +65,12 @@ type Node a
 {-| Create empty `Node` for given values.
 First paramter is function which takes given value and return it's id.
 
-    singleton 1 == Node "" 1 []
-    singleton { a = "b" } == Node "" { a = "b" } []
+    singleton "1" 1 == Node "1" 1 []
+    singleton { a = "b" } == Node "1" { a = "b" } []
 -}
-singleton : a -> Node a
-singleton item =
-    Node "" item []
+singleton : Id -> a -> Node a
+singleton id item =
+    Node id item []
 
 
 {-| Create node. Alias for Node constructor (which was opaque in previous releases)
@@ -203,6 +208,15 @@ reduce reducer b (Node _ a c) =
     List.foldl (flip (reduce reducer)) (reducer a b) c
 
 
+{-|
+-}
+pure : a -> Node a
+pure a =
+    Node "" a []
+
+
+{-|
+-}
 andMap : Node a -> Node (a -> b) -> Node b
 andMap a (Node _ fc _) =
     map fc a

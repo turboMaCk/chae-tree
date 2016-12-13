@@ -8,6 +8,8 @@ module Chae.Tree
         , reduce
         , filter
         , push
+        , pure
+        , andMap
         , fromList
         , subTreeFor
         )
@@ -33,6 +35,9 @@ and manipulate trees only by knowing Ids of items.
 # Map - Reduce
 @docs map, map2, zip, reduce, filter
 
+# Applicative
+@docs pure, andMap
+
 -}
 
 import Tuple
@@ -57,10 +62,6 @@ nil : Tree a
 nil =
     []
 
-
-singleton : a -> Tree a
-singleton a =
-    [ Node.singleton a ]
 
 
 {-| Map function over tree
@@ -133,6 +134,14 @@ filter fc =
         List.foldr sieve []
 
 
+{-|
+-}
+pure : a -> Tree a
+pure a =
+    [ Node.pure a ]
+
+{-|
+-}
 andMap : Tree a -> Tree (a -> b) -> Tree b
 andMap a treeFc =
     case treeFc of
