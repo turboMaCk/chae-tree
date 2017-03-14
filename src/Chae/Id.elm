@@ -19,7 +19,7 @@ type alias Id =
 {-| Convert any value to `Id` type.
 This is just alias for `toString` function.
 
-    toId "str" = "str"
+    toId "str" = "\"str\""
     toId 1 = "1"
     toId { a = "a" } = "{ a = \"a\" }"
 -}
