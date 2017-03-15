@@ -14,6 +14,8 @@ module Chae.Node
         , flatten
         , flatMap
         , reduce
+        , pure
+        , andMap
         , pushDeep
         )
 
@@ -39,6 +41,9 @@ like `pushDeep`.
 # Map - Reduce
 @docs map, map2, flatten, flatMap, reduce
 
+# Applicative
+@docs pure, andMap
+
 -}
 
 import List
@@ -61,7 +66,7 @@ type Node a
 First paramter is function which takes given value and return it's id.
 
     singleton "1" 1 == Node "1" 1 []
-    singleton "1" { a = "b" } == Node "1" { a = "b" } []
+    singleton { a = "b" } == Node "1" { a = "b" } []
 -}
 singleton : Id -> a -> Node a
 singleton id item =
@@ -108,7 +113,7 @@ First argument is function from item to `Id/String`.
 -}
 addChild : Id -> a -> Node a -> Node a
 addChild id item (Node ida a children) =
-    Node ida a ((singleton id item) :: children)
+    Node ida a ((node id item []) :: children)
 
 
 {-| Get child tree of `Node`.
@@ -201,6 +206,20 @@ flatMap fc =
 reduce : (a -> b -> b) -> b -> Node a -> b
 reduce reducer b (Node _ a c) =
     List.foldl (flip (reduce reducer)) (reducer a b) c
+
+
+{-|
+-}
+pure : a -> Node a
+pure a =
+    Node "" a []
+
+
+{-|
+-}
+andMap : Node a -> Node (a -> b) -> Node b
+andMap a (Node _ fc _) =
+    map fc a
 
 
 {-| Find parent node in children by id and push new item to it

@@ -8,6 +8,8 @@ module Chae.Tree
         , reduce
         , filter
         , push
+        , pure
+        , andMap
         , fromList
         , subTreeFor
         )
@@ -33,6 +35,9 @@ and manipulate trees only by knowing Ids of items.
 # Map - Reduce
 @docs map, map2, zip, reduce, filter
 
+# Applicative
+@docs pure, andMap
+
 -}
 
 import Tuple
@@ -56,6 +61,7 @@ Alias for []
 nil : Tree a
 nil =
     []
+
 
 
 {-| Map function over tree
@@ -128,6 +134,28 @@ filter fc =
         List.foldr sieve []
 
 
+{-|
+-}
+pure : a -> Tree a
+pure a =
+    [ Node.pure a ]
+
+{-|
+-}
+andMap : Tree a -> Tree (a -> b) -> Tree b
+andMap a treeFc =
+    case treeFc of
+        [] ->
+            []
+
+        head :: tail ->
+            let
+                ( _, fc, _ ) =
+                    Node.toTuple head
+            in
+                map fc a
+
+
 {-| Produce new tree with given item pushed under its parent.
 First argument is function from item to `Id/String`.
 
@@ -149,7 +177,7 @@ push :
 push getId maybeId item tree =
     case maybeId of
         Nothing ->
-            Node.singleton (getId item) item :: tree
+            Node.node (getId item) item [] :: tree
 
         Just id ->
             List.map (Node.pushDeep id (getId item) item) tree
