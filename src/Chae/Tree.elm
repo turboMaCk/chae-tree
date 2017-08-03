@@ -7,7 +7,7 @@ module Chae.Tree
         , zip
         , reduce
         , filter
-        , filterOr
+        , deepFilter
         , push
         , fromList
         , subTreeFor
@@ -19,20 +19,30 @@ which really differs from general Rose Tree implementation. Along side with func
 trees support operation like `push`, `subTreeFor` and `fromList`. These functions make it easy to create
 and manipulate trees only by knowing Ids of items.
 
+
 # Definition
+
 @docs Tree
 
+
 # Constructors
+
 @docs nil, fromList
 
+
 # Query a Tree
+
 @docs subTreeFor
 
+
 # Common Operations
+
 @docs push
 
+
 # Map - Reduce
-@docs map, map2, zip, reduce, filter, filterOr
+
+@docs map, map2, zip, reduce, filter, deepFilter
 
 -}
 
@@ -64,7 +74,7 @@ Similar to `List.map` but working with trees
 -}
 map : (a -> b) -> Tree a -> Tree b
 map fc =
-    List.map (Node.map fc)
+    List.map <| Node.map fc
 
 
 {-| Map function over two trees to produce new tree from both combined
@@ -76,7 +86,7 @@ map2 :
     -> Tree b
     -> Tree c
 map2 fc =
-    List.map2 (Node.map2 fc)
+    List.map2 <| Node.map2 fc
 
 
 {-| Zip two trees to tree of tuple
@@ -88,7 +98,7 @@ zip =
 
 
 {-| Reduce Tree by given function
-Similar to `List.foldl` but working with trees
+Similar to `List.foldr` but working with trees
 -}
 reduce :
     (a -> b -> b)
@@ -96,7 +106,7 @@ reduce :
     -> Tree a
     -> b
 reduce reducer =
-    List.foldl (flip (Node.reduce reducer))
+    List.foldr <| flip <| Node.reduce reducer
 
 
 {-| Filter Tree.
@@ -105,7 +115,7 @@ If parent node do not pass condition its children are no included in result
 
     tree = [Node.node "5" 5 [ Node.singleton "1" 1, Node.singleton "10" 10 ] ]
 
-    filter ((<) 4) tree == [Node "5" 5 ([Node "10" 10 []])]
+    filter ((<) 4) tree == [ Node "5" 5 ([Node "10" 10 []]) ]
     filter ((<) 6) tree == []
     filter ((<) 0) tree == tree
 
@@ -116,49 +126,41 @@ filter :
     -> Tree a
 filter fc =
     let
-        sieve node acc =
-            let
-                ( id, a, c ) =
-                    Node.toTuple node
-            in
-                if fc a then
-                    (Node.node id a (filter fc c)) :: acc
-                else
-                    acc
+        sieve ( id, a, c ) acc =
+            if fc a then
+                Node.node id a (filter fc c) :: acc
+            else
+                acc
     in
-        List.foldr sieve []
+        List.foldr (sieve << Node.toTuple) []
 
 
-{-| Filter Tree.
-Similar to `List.filter` but working on trees.
-If the predicate is true for any node, it is included in the result.
-If the predicate is false for a parent node but true for any of it's children, the parent node is included in the result.
+{-| Similar to `filter` but includes node when some of its child matches.
 
-    tree = [Node.node "5" 5 [ Node.node "1" 1 [ Node.singleton "9" 9], Node.singleton "10" 10 ] ]
+    tree = [ Node.node "5" 5 [ Node.node "1" 1 [ Node.singleton "9" 9 ], Node.singleton "10" 10 ] ]
 
-    filterOr ((<) 6) tree == [Node "5" 5 ([Node "1" 1 ([Node "9" 9 []]),Node "10" 10 []])]
-    filter ((<) 11) tree == []
-    filter ((<) 0) tree == tree
+    deepFilter ((<) 6) tree == [[ Node.node "5" 5 ([ Node.node "1" 1 ([ Node.node "9" 9 [] ]), Node.node "10" 10 [] ]) ]]
+    deepFilter ((<) 11) tree == []
+    deepFilter ((<) 0) tree == tree
 
 -}
-filterOr :
+deepFilter :
     (a -> Bool)
     -> Tree a
     -> Tree a
-filterOr fc =
+deepFilter fc =
     let
-        sieve node acc =
+        sieve ( id, a, c ) acc =
             let
-                ( id, a, c ) =
-                    Node.toTuple node
-                c_ = filterOr fc c
+                c_ =
+                    deepFilter fc c
             in
                 if fc a || not (List.isEmpty c_) then
-                    (Node.node id a c_) :: acc
+                    Node.node id a c_ :: acc
                 else
                     acc
     in
-        List.foldr sieve []
+        List.foldr (sieve << Node.toTuple) []
 
 
 {-| Produce new tree with given item pushed under its parent.
@@ -166,12 +168,13 @@ First argument is function from item to `Id/String`.
 
 Second argument is `Maybe Id` is ether:
 
-- `Nothing` => push to root
-- `Just parentId` => push to sub Tree
+  - `Nothing` => push to root
 
+  - `Just parentId` => push to sub Tree
 
     push toId Nothing 1 [] == [Node "1" 1 []]
     push toId (Just (toId 1)) 2 [ Node.singleton "1" 1 ] == [Node "1" 1 ([Node "2" 2 []])]
+
 -}
 push :
     (a -> Id)
@@ -205,6 +208,7 @@ Second argument is function from item to `List Id/List String`.
          .parentIds item |> List.map toId
 
      fromList itemId itemParentIds items == [Node "1" { id = 1, name = "first", parentIds = [] } ([Node "2" { id = 2, name = "child", parentIds = [1] } ([Node "3" { id = 3, name = "deep child", parentIds = [2] } []])])]
+
 -}
 fromList :
     (a -> Id)
@@ -226,10 +230,10 @@ fromList_ getId getParentId list maybeId =
         children =
             case maybeId of
                 Nothing ->
-                    List.filter (\item -> List.isEmpty (getParentId item)) list
+                    List.filter (List.isEmpty << getParentId) list
 
                 Just id ->
-                    List.filter (\item -> List.member id (getParentId item)) list
+                    List.filter (List.member id << getParentId) list
     in
         List.map (\i -> Node.node (getId i) i (fromList_ getId getParentId list (Just (getId i)))) children
 
@@ -237,8 +241,8 @@ fromList_ getId getParentId list maybeId =
 {-| Returns sub `Tree` and ancestors for given `Id` and `Tree`.
 First argument is `Maybe Id` is ether:
 
-- `Nothing` => result is given tree (with empty ancestors `List`).
-- `Just parentId` => result is sub tree for node with `id == parentId`.
+  - `Nothing` => result is given tree (with empty ancestors `List`).
+  - `Just parentId` => result is sub tree for node with `id == parentId`.
 
 Returns tuple containing sub tree and list of ancestors of that sub tree (from parent to root).
 
@@ -260,6 +264,7 @@ Returns tuple containing sub tree and list of ancestors of that sub tree (from p
      subTreeFor Nothing tree == (tree, [])
      subTreeFor (Just "1") tree == ([Node "2" { id = 2, name = "child", parentIds = [1] } ([Node "3" { id = 3, name = "dep categories", parentIds = [2] } []])],[{ id = 1, name = "first", parentIds = [] }])
      subTreeFor (Just "2") tree == ([Node "3" { id = 3, name = "dep categories", parentIds = [2] } []],[{ id = 2, name = "child", parentIds = [1] },{ id = 1, name = "first", parentIds = [] }])
+
 -}
 subTreeFor :
     Maybe Id
@@ -281,27 +286,23 @@ subTreeFor_ :
 subTreeFor_ id ( tree, ancestors ) =
     let
         matches =
-            List.filter (\n -> Node.id n == id) tree
+            List.filter ((==) id << Node.id) tree
 
-        nest node =
-            let
-                ( _, item, children ) =
-                    Node.toTuple node
-            in
-                ( children, item :: ancestors )
+        nest ( _, item, children ) =
+            ( children, item :: ancestors )
     in
         case (List.head matches) of
             Just node ->
-                nest node
+                nest <| Node.toTuple node
 
             Nothing ->
                 List.foldr
                     (\child acc ->
                         let
                             subMatches =
-                                subTreeFor_ id (nest child)
+                                subTreeFor_ id <| nest <| Node.toTuple child
                         in
-                            if List.isEmpty (subMatches |> Tuple.second) then
+                            if List.isEmpty <| Tuple.second subMatches then
                                 acc
                             else
                                 subMatches

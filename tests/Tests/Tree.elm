@@ -19,7 +19,7 @@ all =
     describe "Tree"
         [ functorTest
         , filterTest
-        , filterOrTest
+        , deepFilterTest
         , pushTest
         , fromListTest
         , subTreeForTests
@@ -105,8 +105,8 @@ filterTest =
             ]
 
 
-filterOrTest : Test
-filterOrTest =
+deepFilterTest : Test
+deepFilterTest =
     let
         tree =
             [ Node.node "5" 5 [ Node.node "1" 1 [ Node.singleton "9" 9 ], Node.singleton "10" 10 ] ]
@@ -115,17 +115,17 @@ filterOrTest =
             [ test "< 6" <|
                 \() ->
                     Expect.equal
-                        (Tree.filterOr ((<) 6) tree)
-                        ([Node.node "5" 5 ([Node.node "1" 1 ([Node.node "9" 9 []]),Node.node "10" 10 []])])
+                        (Tree.deepFilter ((<) 6) tree)
+                        ([ Node.node "5" 5 ([ Node.node "1" 1 ([ Node.node "9" 9 [] ]), Node.node "10" 10 [] ]) ])
             , test "< 11" <|
                 \() ->
                     Expect.equal
-                        (Tree.filterOr ((<) 11) tree)
+                        (Tree.deepFilter ((<) 11) tree)
                         []
             , test "< 0" <|
                 \() ->
                     Expect.equal
-                        (Tree.filterOr ((<) 0) tree)
+                        (Tree.deepFilter ((<) 0) tree)
                         tree
             ]
 
