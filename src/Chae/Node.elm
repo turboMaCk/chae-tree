@@ -108,7 +108,7 @@ First argument is function from item to `Id/String`.
 -}
 addChild : Id -> a -> Node a -> Node a
 addChild id item (Node ida a children) =
-    Node ida a ((singleton id item) :: children)
+    Node ida a <| singleton id item :: children
 
 
 {-| Get child tree of `Node`.
@@ -153,7 +153,7 @@ produces new modified tree
 -}
 map : (a -> b) -> Node a -> Node b
 map fc (Node id a c) =
-    Node id (fc a) (List.map (map fc) c)
+    Node id (fc a) <| List.map (map fc) c
 
 
 {-| Similar to map, but takes two Nodes and produce new one by combining items of both
@@ -164,7 +164,7 @@ map2 :
     -> Node b
     -> Node c
 map2 fc (Node id a ca) (Node _ b cb) =
-    Node id (fc a b) (List.map2 (map2 fc) ca cb)
+    Node id (fc a b) <| List.map2 (map2 fc) ca cb
 
 
 {-| Similar to `List.zip` but working with Node
@@ -178,7 +178,7 @@ zip =
 -}
 flatten : Node (Node a) -> Node a
 flatten (Node id (Node id2 a c) cs) =
-    Node id a (c ++ List.map flatten cs)
+    Node id a <| c ++ List.map flatten cs
 
 
 {-| Map and flatten
@@ -190,7 +190,7 @@ flatten (Node id (Node id2 a c) cs) =
 -}
 flatMap : (a -> Node b) -> Node a -> Node b
 flatMap fc =
-    map fc >> flatten
+    flatten << map fc
 
 
 {-| Reduce Node by given function. Similar to `List.foldr`
@@ -200,7 +200,7 @@ flatMap fc =
 -}
 reduce : (a -> b -> b) -> b -> Node a -> b
 reduce reducer b (Node _ a c) =
-    List.foldr (flip (reduce reducer)) (reducer a b) c
+    List.foldr (flip <| reduce reducer) (reducer a b) c
 
 
 {-| Find parent node in children by id and push new item to it
@@ -219,4 +219,4 @@ pushDeep id aid item ((Node nodeId a children) as node) =
     if nodeId == id then
         addChild aid item node
     else
-        Node nodeId a (List.map (pushDeep id aid item) children)
+        Node nodeId a <| List.map (pushDeep id aid item) children
