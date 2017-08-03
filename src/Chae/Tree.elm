@@ -7,6 +7,7 @@ module Chae.Tree
         , zip
         , reduce
         , filter
+        , filterOr
         , push
         , fromList
         , subTreeFor
@@ -31,7 +32,7 @@ and manipulate trees only by knowing Ids of items.
 @docs push
 
 # Map - Reduce
-@docs map, map2, zip, reduce, filter
+@docs map, map2, zip, reduce, filter, filterOr
 
 -}
 
@@ -122,6 +123,38 @@ filter fc =
             in
                 if fc a then
                     (Node.node id a (filter fc c)) :: acc
+                else
+                    acc
+    in
+        List.foldr sieve []
+
+
+{-| Filter Tree.
+Similar to `List.filter` but working on trees.
+If the predicate is true for any node, it is included in the result.
+If the predicate is false for a parent node but true for any of it's children, the parent node is included in the result.
+
+    tree = [Node.node "5" 5 [ Node.node "1" 1 [ Node.singleton "9" 9], Node.singleton "10" 10 ] ]
+
+    filterOr ((<) 6) tree == [Node "5" 5 ([Node "1" 1 ([Node "9" 9 []]),Node "10" 10 []])]
+    filter ((<) 11) tree == []
+    filter ((<) 0) tree == tree
+
+-}
+filterOr :
+    (a -> Bool)
+    -> Tree a
+    -> Tree a
+filterOr fc =
+    let
+        sieve node acc =
+            let
+                ( id, a, c ) =
+                    Node.toTuple node
+                c_ = filterOr fc c
+            in
+                if fc a || not (List.isEmpty c_) then
+                    (Node.node id a c_) :: acc
                 else
                     acc
     in
