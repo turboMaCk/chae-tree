@@ -200,7 +200,7 @@ flatMap fc =
 -}
 reduce : (a -> b -> b) -> b -> Node a -> b
 reduce reducer b (Node _ a c) =
-    List.foldl (flip (reduce reducer)) (reducer a b) c
+    List.foldr (flip (reduce reducer)) (reducer a b) c
 
 
 {-| Find parent node in children by id and push new item to it
