@@ -135,7 +135,7 @@ filter fc =
         List.foldr (sieve << Node.toTuple) []
 
 
-{-| Similar to filter but includes node when some of its child matches.
+{-| Similar to `filter` but includes node when some of its child matches.
 
     tree = [ Node.node "5" 5 [ Node.node "1" 1 [ Node.singleton "9" 9 ], Node.singleton "10" 10 ] ]
 
