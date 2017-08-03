@@ -116,7 +116,7 @@ deepFilterTest =
                 \() ->
                     Expect.equal
                         (Tree.deepFilter ((<) 6) tree)
-                        ([Node.node "5" 5 ([Node.node "1" 1 ([Node.node "9" 9 []]),Node.node "10" 10 []])])
+                        ([ Node.node "5" 5 ([ Node.node "1" 1 ([ Node.node "9" 9 [] ]), Node.node "10" 10 [] ]) ])
             , test "< 11" <|
                 \() ->
                     Expect.equal

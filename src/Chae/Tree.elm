@@ -115,7 +115,7 @@ If parent node do not pass condition its children are no included in result
 
     tree = [Node.node "5" 5 [ Node.singleton "1" 1, Node.singleton "10" 10 ] ]
 
-    filter ((<) 4) tree == [Node "5" 5 ([Node "10" 10 []])]
+    filter ((<) 4) tree == [ Node "5" 5 ([Node "10" 10 []]) ]
     filter ((<) 6) tree == []
     filter ((<) 0) tree == tree
 
@@ -135,7 +135,14 @@ filter fc =
         List.foldr (sieve << Node.toTuple) []
 
 
-{-| Filter Tree Levels.
+{-| Similar to filter but includes node when some of its child matches.
+
+    tree = [ Node.node "5" 5 [ Node.node "1" 1 [ Node.singleton "9" 9 ], Node.singleton "10" 10 ] ]
+
+    deepFilter ((<) 6) tree == [[ Node.node "5" 5 ([ Node.node "1" 1 ([ Node.node "9" 9 [] ]), Node.node "10" 10 [] ]) ]]
+    deepFilter ((<) 11) tree == []
+    deepFilter ((<) 0) tree == tree
+
 -}
 deepFilter :
     (a -> Bool)
@@ -162,6 +169,7 @@ First argument is function from item to `Id/String`.
 Second argument is `Maybe Id` is ether:
 
   - `Nothing` => push to root
+
   - `Just parentId` => push to sub Tree
 
     push toId Nothing 1 [] == [Node "1" 1 []]
