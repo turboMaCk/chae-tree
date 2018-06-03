@@ -2,6 +2,12 @@
 
 [![Build Status](https://travis-ci.org/turboMaCk/chae-tree.svg?branch=master)](https://travis-ci.org/turboMaCk/chae-tree)
 
+**This package is now deprecated and won't be upgraded for next version of elm!
+Please pick one of following instead:**
+
+- [turboMaCk/lazy-tree-with-zipper](https://github.com/turboMaCk/lazy-tree-with-zipper) lazy rose-tree with zipper
+- [tomjkidd/elm-multiway-tree-zipper](https://github.com/tomjkidd/elm-multiway-tree-zipper/) strict rose-tree with zipper
+
 Create multi-level navigation in elm easily.
 
 This package provides essential abstractions for manipulating and creating tree data structure directly from your collection data.
